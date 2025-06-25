@@ -1,9 +1,4 @@
 <template>
-
-
-
-
-
     <div class="offcanvas offcanvas-start maincollapse" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel" style="width: 280px; min-height: 100vh;     background: linear-gradient(to bottom, #0c2c47 55%, #7ea1af 100%);">
         <div class="offcanvas-header">
             <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">

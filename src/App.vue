@@ -38,8 +38,13 @@ export default {
   position: absolute;
   left: 10px;
   top: 10px;
+  
 
 
+}
+
+.NavButton:hover{
+  border: #0c2c47 solid 2px;
 }
 
 </style>

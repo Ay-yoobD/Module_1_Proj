@@ -16,7 +16,7 @@
       <tbody>
         <tr v-for="emp in employees" :key="emp.id">
           <th scope="row">{{ emp.id }}</th>
-          <td>{{ emp.name }}</td>
+          <td>{{ emp.name }}</td> 
           <td>{{ emp.position }}</td>
           <td>{{ emp.department }}</td>
           <td>{{ emp.salary }}</td>
