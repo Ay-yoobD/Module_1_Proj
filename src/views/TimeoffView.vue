@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="main-container">
     <h1>Leave Request Form</h1>
+
     <div class="form-container">
       <form @submit.prevent="submitForm">
 
@@ -28,8 +29,8 @@
         <button type="submit">Request</button>
       </form>
 
-      <div v-if="leaveRequests.length" class="requests-list">
-        <h2>Leave Requests</h2>
+      <div class="requests-list" style="margin-top: 40px;">
+        <h2>New Leave Requests (Pending HR Review)</h2>
         <table>
           <thead>
             <tr>
@@ -37,15 +38,52 @@
               <th>Date</th>
               <th>Type</th>
               <th>Reason</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(request, index) in leaveRequests" :key="index">
-
+            <tr v-if="leaveRequests.length === 0">
+              <td colspan="6" style="text-align: center; font-style: italic; color: #666;">
+                No new leave requests.
+              </td>
+            </tr>
+            <tr v-for="(request, index) in leaveRequests" :key="request.id">
               <td>{{ request.name }}</td>
               <td>{{ request.date }}</td>
               <td>{{ request.type }}</td>
               <td>{{ request.reason }}</td>
+              <td>{{ request.status }}</td>
+              <td>
+                <button @click="approveRequest(index)">Approve</button>
+                <button @click="denyRequest(index)">Deny</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- JSON employee data leave requests -->
+    <div v-if="employeeData.length" class="requests-list">
+      <h2>All Employee Leave Requests</h2>
+      <div v-for="(employee, index) in employeeData" :key="index" class="employee-block">
+        <h3 class="h3">{{ employee.name }}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Reason</th>
+              <th>Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(request, rIndex) in employee.leaveRequests" :key="rIndex">
+              <td>{{ request.date }}</td>
+              <td>{{ request.reason }}</td>
+              <td>{{ request.type || '-' }}</td>
+              <td>{{ request.status }}</td>
             </tr>
           </tbody>
         </table>
@@ -60,24 +98,63 @@ export default {
   data() {
     return {
       form: {
+        name: '',
         date: '',
         type: '',
         reason: ''
       },
-      leaveRequests: []
+      leaveRequests: [], // new unprocessed requests
+      employeeData: [] // loaded from JSON
     }
+  },
+  mounted() {
+    fetch('/attendance.json')
+      .then(response => response.json())
+      .then(data => {
+        this.employeeData = data.attendanceAndLeave
+      })
+      .catch(error => {
+        console.error("Failed to load JSON:", error);
+      })
   },
   methods: {
     submitForm() {
-      // Add a copy of the form data to leaveRequests array
-      this.leaveRequests.push({ ...this.form })
+      const newRequest = {
+        ...this.form,
+        status: 'pending',
+        id: Date.now()
+      }
+      this.leaveRequests.push(newRequest)
 
       alert('Leave request submitted successfully!')
 
       // Reset form
-      this.form.date = ''
-      this.form.type = ''
-      this.form.reason = ''
+      this.form = { name: '', date: '', type: '', reason: '' }
+    },
+    approveRequest(index) {
+      this.processRequest(index, 'approved')
+    },
+    denyRequest(index) {
+      this.processRequest(index, 'denied')
+    },
+    processRequest(index, status) {
+      const request = this.leaveRequests[index]
+      request.status = status
+
+      const employee = this.employeeData.find(emp => emp.name === request.name)
+      if (employee) {
+        employee.leaveRequests.push({
+          date: request.date,
+          reason: request.reason,
+          type: request.type,
+          status: request.status
+        })
+      } else {
+        alert('Employee not found in employee data.')
+      }
+
+      // Remove from new requests list
+      this.leaveRequests.splice(index, 1)
     }
   }
 }
@@ -91,6 +168,11 @@ export default {
 
 h1 {
   text-align: center;
+}
+
+.h3 {
+  margin-top: 20px;
+  text-decoration: underline;
 }
 
 form {
@@ -131,6 +213,7 @@ button {
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.3s, color 0.3s;
+  margin-bottom: 5px;
 }
 
 button:hover {
@@ -139,25 +222,31 @@ button:hover {
   border: 1px solid #0f0f0f;
 }
 
-.form-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  min-height: 100vh;
-  padding-top: 50px;
-  box-sizing: border-box;
+.main-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-/* Leave requests table styling */
+.form-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  padding-bottom: 30px;
+}
+
 .requests-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-top: 30px;
-  width: 400px;
 }
 
 .requests-list h2 {
   margin-bottom: 10px;
-  text-align: center;
 }
 
 .requests-list table {
@@ -175,5 +264,10 @@ button:hover {
 
 .requests-list th {
   background-color: #f4f6fb;
+}
+
+.employee-block {
+  margin-bottom: 20px;
+  width: 100%;
 }
 </style>
