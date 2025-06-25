@@ -87,9 +87,6 @@ export default {
     color: #00070d;
 }
 
-.Links a {
-  
 
-}
 
 </style>

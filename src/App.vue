@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex">
     <NavBar />
-    <div class="content flex-grow-1 p-3 position-relative">
+    <div class="content flex-grow-1 position-relative">
       <button class="btn NavButton" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
         ☰ 
       </button>
@@ -28,7 +28,9 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  min-height: 100vh;
+ 
+  max-height: 99vh;
+  min-width: 99vh;
 }
 
 .NavButton{
