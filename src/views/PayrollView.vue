@@ -47,16 +47,16 @@
                                         <h3>Employee Salary & Payroll information:</h3>
                                         <dl class="EmployeeInfo">
                                             <dt>Employee ID :</dt>
-                                            <dd></dd>
+                                            <dd>{{ selectedEmployee?.employeeId }}</dd>
 
                                             <dt>Hours employee worked:</dt>
-                                            <dd></dd>
+                                            <dd>{{ selectedEmployee?.hoursWorked }}</dd>
 
                                             <dt>Amount of deductions:</dt>
-                                            <dd></dd>
+                                            <dd>{{ selectedEmployee?.leaveDeductions }}</dd>
 
-                                            <dt>Final Salary after deductions:</dt>
-                                            <dd></dd>
+                                            <dt>Gross Salary Amount:</dt>
+                                            <dd>{{ selectedEmployee?.finalSalary }}</dd>
 
                                         </dl>
 
@@ -67,9 +67,12 @@
                             </div>
 
                             <div class="col-lg-5 text-center ">
-                                <select name="EmployeeSelect" id="cmbEmployeeSelect">
+                                <select v-model="selectedEmployeeId" name="EmployeeSelect" id="cmbEmployeeSelect">
                                     <option selected disabled hidden value="">Choose Employee</option>
-
+                                    <option v-for="EmployeeData in EmployeeInfo" :key="EmployeeData.employeeId"
+                                        :value="EmployeeData.employeeId">
+                                        ID:{{ EmployeeData.employeeId }} {{ EmployeeData.name }}
+                                    </option>
                                 </select>
 
                                 <br>
@@ -77,13 +80,13 @@
                                     Show all deduction full details
                                 </button>
                                 <button class="MainPayBtn">Calculate & Display full payslip details</button>
-                                <button @click="showarr(a)" class="MainPayBtn">Create Digital Payslip (PDF)</button>
+                                <button @click="tester()" class="MainPayBtn">Create Digital Payslip (PDF)</button>
 
                             </div>
 
                         </div>
                     </div>
-
+                    <hr>
                 </section>
 
             </div>
@@ -110,38 +113,39 @@
                         </div>
                     </div>
                 </div>
+
             </div>
 
-            <hr>
+
 
             <div class="container-lg justify-content-center align-items-center">
 
                 <div class="col text-center text-md-center">
-    
+
                     <div class="PaySlipMain row justify-content-center align-content-center">
                         <div class="info-card">
                             <h3>ModernTech Employee Slip:</h3>
 
-                            <dl class="student-info">
+                            <dl class="student-info" v-if="selectedEmployeeId">
 
-                                <dt>Employee ID :</dt>
-                                <dd></dd>
-    
-                                <dt>Hours employee worked:</dt>
-                                <dd></dd>
-    
-                                <dt>Amount of deductions:</dt>
-                                <dd></dd>
-    
-                                <dt>Final Salary after deductions:</dt>
-                                <dd></dd>
-    
+                                <dt>Employee ID:</dt>
+                                <dd>{{ selectedEmployee.employeeId }}</dd>
+
+                                <dt>Hours Worked:</dt>
+                                <dd>{{ selectedEmployee.hoursWorked }}</dd>
+
+                                <dt>Leave Deductions:</dt>
+                                <dd>{{ selectedEmployee.leaveDeductions }}</dd>
+
+                                <dt>Final Salary:</dt>
+                                <dd>{{ selectedEmployee.finalSalary }}</dd>
+
                             </dl>
-    
+
                         </div>
-    
+
                     </div>
-    
+
                 </div>
 
             </div>
@@ -153,17 +157,34 @@
 </template>
 
 <script>
-import PayrollData from '@/assets/Resources/DummyData/payroll_data.json'
+import PayrollData from '@/assets/Resources/payroll_data.json'
+import EmployeeData from '@/assets/Resources/employee_info.json'
 
 export default {
     data() {
         return {
-            test: PayrollData
+            EmployeeList: PayrollData.payrollData,
+            EmployeeInfo: EmployeeData.employeeInformation,
+            selectedEmployeeId: ''
 
         }
 
     },
 
+    methods: {
+        tester() {
+            return console.log(this.EmployeeList);
+
+        }
+    },
+    
+    computed: {
+        selectedEmployee() {
+            return this.EmployeeList.find(
+                employee => employee.employeeId === Number(this.selectedEmployeeId)
+            );
+        }
+    }
 
 
 
