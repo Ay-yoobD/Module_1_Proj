@@ -3,7 +3,7 @@
     <NavBar />
     <div class="content flex-grow-1 position-relative">
       <button class="btn NavButton" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
-        ☰ 
+       ☰
       </button>
       <router-view />
     </div>

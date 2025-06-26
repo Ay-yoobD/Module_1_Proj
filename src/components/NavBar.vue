@@ -76,12 +76,6 @@ export default {
 </script>
 
 <style>
-/* .MainSideBar {
-    min-height: 100vh;
-    background: linear-gradient(to bottom, #0c2c47 55%, #7ea1af 100%);
-    border-right: #0b273e solid;
-
-} */
 
 .hrNav {
     color: #00070d;
