@@ -12,12 +12,12 @@
                 </figure>
 
                 <figure class="figure PayImage">
-                    <img src="../assets/DonutChart.png" class="figure-img img-fluid rounded" alt="...">
+                    <img src="../assets/SalariesPie.png" class="figure-img img-fluid rounded" alt="...">
                     <figcaption class="figure-caption">Total Paid Takeaway Salaries vs Not Paid</figcaption>
                 </figure>
 
                 <figure class="figure PayImage">
-                    <img src="../assets/IncreasingGraph.png" class="figure-img img-fluid rounded" alt="...">
+                    <img src="../assets/EmployeeGraph.jpg" class="figure-img img-fluid rounded" alt="...">
                     <figcaption class="figure-caption">Increasing number of ModernTech employees</figcaption>
                 </figure>
 
@@ -39,18 +39,21 @@
 
                         <div class="row justify-content-center align-items-center">
 
-                            <div class="col-md-5 text-center text-md-start">
+                            <div class="col-md-5 text-center text-md-start testbox">
 
                                 <div class="PayManageBody">
 
                                     <div class="info-card">
-                                        <h3>Employee Salary & Payroll information:</h3>
+                                        <h3 class="fw-bolder">Employee Salary & Payroll overview:</h3>
                                         <dl class="EmployeeInfo">
                                             <dt>Employee ID :</dt>
                                             <dd>{{ selectedEmployee?.employeeId }}</dd>
 
                                             <dt>Hours employee worked:</dt>
                                             <dd>{{ selectedEmployee?.hoursWorked }}</dd>
+
+                                            <dt>Hourly Rate:</dt>
+                                            <dd>R {{  employeeratephr ? employeeratephr.toFixed(2) : 'N/A'  }} / hr</dd>
 
                                             <dt>Amount of deductions:</dt>
                                             <dd>{{ selectedEmployee?.leaveDeductions }}</dd>
@@ -66,7 +69,7 @@
 
                             </div>
 
-                            <div class="col-lg-5 text-center ">
+                            <div class="col-lg-5 text-center  ">
                                 <select v-model="selectedEmployeeId" name="EmployeeSelect" id="cmbEmployeeSelect">
                                     <option selected disabled hidden value="">Choose Employee</option>
                                     <option v-for="EmployeeData in EmployeeInfo" :key="EmployeeData.employeeId"
@@ -79,7 +82,7 @@
                                 <button class="MainPayBtn" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                     Show all deduction full details
                                 </button>
-                                <button class="MainPayBtn">Calculate & Display full payslip details</button>
+                                <button class="MainPayBtn">Calculate and Display full payslip details</button>
                                 <button @click="tester()" class="MainPayBtn">Create Digital Payslip (PDF)</button>
 
                             </div>
@@ -99,13 +102,22 @@
                     <div class="modal-content">
 
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                            <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Detailed Deduction List</h1>
+
 
                         </div>
 
-                        <div class="modal-body">
-                            Hello World
+                        <div v-if="selectedEmployeeId " class="modal-body ">
+                            <p> Number of deductions: {{ selectedEmployee.leaveDeductions }}</p>
+                            <p>Deductions in Rands: R {{ deductionInRands.toLocaleString() }}</p>
+                            <p><strong>Other Deductions</strong></p>
+                            <p>Tax - 16%</p>
+                            <p>PAYE - 3.5%</p>
+                            <p>Health Insurance - 5%</p>
+                         
+                        </div>
+                        <div v-else class="modal-body">
+                            Please select an employee
                         </div>
 
                         <div class="modal-footer">
@@ -124,21 +136,21 @@
 
                     <div class="PaySlipMain row justify-content-center align-content-center">
                         <div class="info-card">
-                            <h3>ModernTech Employee Slip:</h3>
+                            <h3 class="fw-bold display-5">ModernTech Employee Payslip:</h3>
 
-                            <dl class="student-info" v-if="selectedEmployeeId">
+                            <dl class="FullPayDetails" >
 
                                 <dt>Employee ID:</dt>
-                                <dd>{{ selectedEmployee.employeeId }}</dd>
+                                <dd></dd>
 
-                                <dt>Hours Worked:</dt>
-                                <dd>{{ selectedEmployee.hoursWorked }}</dd>
+                                <dt>Employee Name:</dt>
+                                <dd></dd>
 
                                 <dt>Leave Deductions:</dt>
-                                <dd>{{ selectedEmployee.leaveDeductions }}</dd>
+                                <dd></dd>
 
                                 <dt>Final Salary:</dt>
-                                <dd>{{ selectedEmployee.finalSalary }}</dd>
+                                <dd></dd>
 
                             </dl>
 
@@ -157,38 +169,65 @@
 </template>
 
 <script>
+//Importing locally stored json files
 import PayrollData from '@/assets/Resources/payroll_data.json'
 import EmployeeData from '@/assets/Resources/employee_info.json'
 
 export default {
     data() {
         return {
-            EmployeeList: PayrollData.payrollData,
-            EmployeeInfo: EmployeeData.employeeInformation,
-            selectedEmployeeId: ''
+            //Creating objects to hold the json data and selected id from <select> element above
+            EmployeeList: PayrollData.payrollData,                  //Holds employee payroll data
+            EmployeeInfo: EmployeeData.employeeInformation,         //Holds general employee details
+            selectedEmployeeId: ''                                  //Will be filled with ID from select elemnt above
 
         }
 
     },
-
+    //Function made to be called just to test if json came through, wont be used anywhere   
     methods: {
         tester() {
             return console.log(this.EmployeeList);
 
         }
     },
-    
+
+
+    //Selecting the related information using the v-model/selected id from dropdown
+    //Find is used to search through the array to find matching Employee ID
     computed: {
-        selectedEmployee() {
+        selectedEmployee(){
             return this.EmployeeList.find(
-                employee => employee.employeeId === Number(this.selectedEmployeeId)
+                EmployeePay => EmployeePay.employeeId === Number(this.selectedEmployeeId)
             );
+        },
+
+        selectedEmployeeDetails(){
+            return this.EmployeeInfo.find(
+                EmployeeData => EmployeeData.employeeId === Number(this.selectedEmployeeId)
+            );
+
+        },
+        //Simple calcalution to find the deduction in rands
+        deductionInRands(){
+            if (this.selectedEmployee && this.selectedEmployeeDetails) {
+                return this.selectedEmployeeDetails.salary - this.selectedEmployee.finalSalary;
+            }
+        },
+        //Calculation to find the pay rate per hour of an employee
+        employeeratephr(){
+            if (this.selectedEmployee && this.selectedEmployeeDetails && this.selectedEmployee.hoursWorked > 0){
+                return this.selectedEmployeeDetails.salary / this.selectedEmployee.hoursWorked
+            }
+            return 0;
+            
+            
         }
+
     }
 
-
-
 }
+
 </script>
 
 <style>
@@ -252,7 +291,7 @@ export default {
     text-align: center;
     border-radius: 5px;
     border: #0c2c47 solid 3px;
-    box-shadow: #e2a54d 3px 3px;
+    box-shadow: #e2a54d 3px 3px 2px;
     background: #93d1cb;
     padding: 7px 5px;
     transition: background 0.3s ease;
@@ -277,12 +316,30 @@ export default {
     padding: 5px 5px;
     border: 2px solid #0c2c47;
     border-radius: 5px;
+    box-shadow: #e2a54d 3px 3px 2px;
     transition: background 0.3s ease;
-    transition: transform 0.3s ease;
+
 
 }
 
 #cmbEmployeeSelect:hover {
     border: solid #c3e4d1;
 }
+
+.testbox{
+    box-shadow: #e2a54d 4px 4px 3px;
+    border: #0c2c47 solid 3px;
+    padding: 35px;
+    border-radius: 5px;
+}
+
+.testbox h3{
+    text-decoration: underline;
+}
+
+.modal-body{
+    font-size: 18px;
+
+}
+
 </style>
