@@ -1,6 +1,8 @@
 <template>
-  <div class="d-flex"> <!-- Bootstrap's flex container -->
-    <NavBar />
+  <div class="d-flex">
+    <!-- Show NavBar only if NOT on login page -->
+    <NavBar v-if="showNavbar" />
+
     <div class="content flex-grow-1 p-3">
       <router-view />
     </div>
@@ -8,14 +10,25 @@
 </template>
 
 <script>
-  import NavBar from "./components/NavBar.vue";
+import NavBar from "./components/NavBar.vue";
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 
-  export default {
-    components:{
-      NavBar
-    }
-    
-  }
+export default {
+  components: {
+    NavBar,
+  },
+  setup() {
+    const route = useRoute();
+
+    // Hide NavBar on login page (route name 'login')
+    const showNavbar = computed(() => route.name !== "login");
+
+    return {
+      showNavbar,
+    };
+  },
+};
 </script>
 
 <style>
@@ -28,4 +41,8 @@
   min-height: 100vh;
 }
 
+/* Optional: Make sure content fills space when sidebar is hidden */
+.content {
+  width: 100%;
+}
 </style>
