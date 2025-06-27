@@ -1,6 +1,5 @@
 <template>
   <div class="d-flex">
-    <!-- Show NavBar only if NOT on login page -->
     <NavBar v-if="showNavbar" />
 
     <div class="content flex-grow-1 p-3">
@@ -21,7 +20,6 @@ export default {
   setup() {
     const route = useRoute();
 
-    // Hide NavBar on login page (route name 'login')
     const showNavbar = computed(() => route.name !== "login");
 
     return {
@@ -41,7 +39,6 @@ export default {
   min-height: 100vh;
 }
 
-/* Optional: Make sure content fills space when sidebar is hidden */
 .content {
   width: 100%;
 }
