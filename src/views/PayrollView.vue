@@ -1,4 +1,4 @@
-<template>
+z<template>
     <div class="MainPayRoll">
         <header class="PayRollHead">
             <h2 class=" p-3 fw-bold">Payroll & Payslip management:</h2>
@@ -53,7 +53,7 @@
                                             <dd>{{ selectedEmployee?.hoursWorked }}</dd>
 
                                             <dt>Hourly Rate:</dt>
-                                            <dd>R {{  employeeratephr ? employeeratephr.toFixed(2) : 'N/A'  }} / hr</dd>
+                                            <dd>R {{ employeeratephr ? employeeratephr.toFixed(2) : 'N/A' }} / hr</dd>
 
                                             <dt>Amount of deductions:</dt>
                                             <dd>{{ selectedEmployee?.leaveDeductions }}</dd>
@@ -78,12 +78,15 @@
                                     </option>
                                 </select>
 
-                                <br>
                                 <button class="MainPayBtn" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                     Show all deduction full details
                                 </button>
-                                <button class="MainPayBtn">Calculate and Display full payslip details</button>
-                                <button @click="tester()" class="MainPayBtn">Create Digital Payslip (PDF)</button>
+
+                                <button class="MainPayBtn" @click="showPayslipDetails">
+                                    Calculate and Display full payslip details
+                                </button>
+
+                                <button class="MainPayBtn">Create Digital Payslip (PDF)</button>
 
                             </div>
 
@@ -107,14 +110,14 @@
 
                         </div>
 
-                        <div v-if="selectedEmployeeId " class="modal-body ">
+                        <div v-if="selectedEmployeeId" class="modal-body ">
                             <p> Number of deductions: {{ selectedEmployee.leaveDeductions }}</p>
                             <p>Deductions in Rands: R {{ deductionInRands.toLocaleString() }}</p>
                             <p><strong>Other Deductions</strong></p>
-                            <p>Tax - 16%</p>
-                            <p>PAYE - 3.5%</p>
+                            <p>PAYE - 34%</p>
+                            <p>UIF - 2%</p>
                             <p>Health Insurance - 5%</p>
-                         
+
                         </div>
                         <div v-else class="modal-body">
                             Please select an employee
@@ -128,33 +131,97 @@
 
             </div>
 
+            <div class="container-xl PaySlipRow">
+
+                <h3 class="fw-bold display-5 py-2  text-center">ModernTech Employee Payslip:</h3>
+
+                <hr>
+
+                <div v-if="selectedEmployeeId && payslipVisible" class="row mb-3 ">
+
+                    <div class="col-md-8 themed-grid-col text-start">
+                        MordernTech Employee ID: {{ selectedEmployee?.employeeId }}
+                        <br>
+                        Employee Name: {{ selectedEmployeeDetails?.name }}
+                        <br>
+                        Company Position: {{ selectedEmployeeDetails?.position }}
+                        <br>
+
+                        <br>
 
 
-            <div class="container-lg justify-content-center align-items-center">
+                    </div>
 
-                <div class="col text-center text-md-center">
+                    <div class="col-6 col-md-4 themed-grid-col text-start">
+                        Employee Department: {{ selectedEmployeeDetails?.department }}
+                        <br>
+                        Hourly Rate:R {{ employeeratephr ? employeeratephr.toFixed(2) : 'N/A' }}
+                        <br>
+                        Hours Worked: {{ selectedEmployee?.hoursWorked }}
 
-                    <div class="PaySlipMain row justify-content-center align-content-center">
-                        <div class="info-card">
-                            <h3 class="fw-bold display-5">ModernTech Employee Payslip:</h3>
 
-                            <dl class="FullPayDetails" >
+                    </div>
+                    <hr>
+                    <div class="col-md-8 themed-grid-col text-start">
+                        Initial Employee Salary:
+                        <br>
+                        Deductions from salary:
+                        <br>
+                        Deductions in Rands:
+                        <br>
+                        Taxable Salary:
+                        <br>
+                        <br>
+                        <h6><strong>Other Deductions:</strong></h6>
+                        PAYE Percentage:
+                        <br>
+                        PAYE Amount:
+                        <br>
+                        UIF Percantage:
+                        <br>
+                        UIF Amount:
+                        <br>
+                        Health Insurance Percantage:
+                        <br>
+                        Health Insurance Amount:
+                        <br>
+                        <br>
+                        <h5><strong>Take Home Pay:</strong></h5>
+                        <br>
 
-                                <dt>Employee ID:</dt>
-                                <dd></dd>
 
-                                <dt>Employee Name:</dt>
-                                <dd></dd>
+                    </div>
 
-                                <dt>Leave Deductions:</dt>
-                                <dd></dd>
+                    <div class="col-6 col-md-4 themed-grid-col text-end">
+                        R{{ selectedEmployeeDetails?.salary }}
+                        <br>
+                        {{ selectedEmployee?.leaveDeductions }}
+                        <br>
+                        R {{ deductionInRands.toLocaleString() }}
+                        <br>
+                        R {{ selectedEmployee?.finalSalary }}
 
-                                <dt>Final Salary:</dt>
-                                <dd></dd>
+                        <br>
+                        <br>
+                        <br>
+                        34%
+                        <br>
+                        {{ calculatePAYE.toFixed(2).toLocaleString() }}
+                        <br>
+                        2%
+                        <br>
+                        {{ calculateUIF.toFixed(2).toLocaleString() }}
+                        <br>
+                        5%
+                        <br>
+                        {{ calculateHealthInsure.toFixed(2).toLocaleString() }}
+                        <br>
+                        <br>
+                        <br>
+                        R {{ calculateTakeHome.toFixed(2).toLocaleString() }}
 
-                            </dl>
 
-                        </div>
+
 
                     </div>
 
@@ -179,16 +246,23 @@ export default {
             //Creating objects to hold the json data and selected id from <select> element above
             EmployeeList: PayrollData.payrollData,                  //Holds employee payroll data
             EmployeeInfo: EmployeeData.employeeInformation,         //Holds general employee details
-            selectedEmployeeId: ''                                  //Will be filled with ID from select elemnt above
+            selectedEmployeeId: '',                                  //Will be filled with ID from select elemnt above
+            payslipVisible: false
 
         }
 
     },
-    //Function made to be called just to test if json came through, wont be used anywhere   
+    //Function made to be called just to test if json came through, wont be used anywhere in 'live' site  
     methods: {
         tester() {
             return console.log(this.EmployeeList);
 
+        },
+
+        showPayslipDetails() {
+            if (this.selectedEmployeeId) {
+                this.payslipVisible = true
+            }
         }
     },
 
@@ -196,36 +270,77 @@ export default {
     //Selecting the related information using the v-model/selected id from dropdown
     //Find is used to search through the array to find matching Employee ID
     computed: {
-        selectedEmployee(){
+        selectedEmployee() {
             return this.EmployeeList.find(
                 EmployeePay => EmployeePay.employeeId === Number(this.selectedEmployeeId)
             );
         },
 
-        selectedEmployeeDetails(){
+        selectedEmployeeDetails() {
             return this.EmployeeInfo.find(
                 EmployeeData => EmployeeData.employeeId === Number(this.selectedEmployeeId)
             );
 
         },
+
         //Simple calcalution to find the deduction in rands
-        deductionInRands(){
+        deductionInRands() {
             if (this.selectedEmployee && this.selectedEmployeeDetails) {
                 return this.selectedEmployeeDetails.salary - this.selectedEmployee.finalSalary;
             }
         },
+
         //Calculation to find the pay rate per hour of an employee
-        employeeratephr(){
-            if (this.selectedEmployee && this.selectedEmployeeDetails && this.selectedEmployee.hoursWorked > 0){
+        employeeratephr() {
+            if (this.selectedEmployee && this.selectedEmployeeDetails && this.selectedEmployee.hoursWorked > 0) {
                 return this.selectedEmployeeDetails.salary / this.selectedEmployee.hoursWorked
             }
             return 0;
-            
-            
+
+
+        },
+
+        calculatePAYE() {
+            if (this.selectedEmployee && this.selectedEmployeeDetails) {
+                let iPercent = 36;
+                return this.selectedEmployee.finalSalary * (iPercent / 100)
+
+            }
+
+        },
+
+        calculateUIF() {
+            if (this.selectedEmployee && this.selectedEmployeeDetails) {
+                let iPercent = 2;
+                return this.selectedEmployee.finalSalary * (iPercent / 100)
+  
+            }
+
+        },
+
+        calculateHealthInsure() {
+            if (this.selectedEmployee && this.selectedEmployeeDetails) {
+                let iPercent = 5;
+                return this.selectedEmployee.finalSalary * (iPercent / 100)
+
+            }
+
+        },
+
+        calculateTakeHome() {
+            if (this.selectedEmployee && this.selectedEmployeeDetails) {
+                return (
+                    this.selectedEmployee.finalSalary -
+                    this.calculatePAYE -
+                    this.calculateUIF -
+                    this.calculateHealthInsure
+                );
+            }
+            return 0;
+
         }
 
     }
-
 }
 
 </script>
@@ -326,20 +441,25 @@ export default {
     border: solid #c3e4d1;
 }
 
-.testbox{
+.testbox {
     box-shadow: #e2a54d 4px 4px 3px;
     border: #0c2c47 solid 3px;
     padding: 35px;
     border-radius: 5px;
 }
 
-.testbox h3{
+.testbox h3 {
     text-decoration: underline;
 }
 
-.modal-body{
+.modal-body {
     font-size: 18px;
 
 }
 
+.PaySlipRow {
+    border: #0c2c47 solid 2.5px;
+    border-radius: 5px;
+    padding: 30px;
+}
 </style>
