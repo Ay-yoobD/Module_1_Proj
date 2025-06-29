@@ -86,7 +86,13 @@ z<template>
                                     Calculate and Display full payslip details
                                 </button>
 
-                                <button class="MainPayBtn">Create Digital Payslip (PDF)</button>
+                                <a style="text-decoration: none; color: black;" :href="selectedEmployeeId && payslipVisible ? `/PDFs/Payslip_${selectedEmployeeId}.pdf` : '#'" 
+                                    :download="selectedEmployeeId && payslipVisible ? `Payslip_${selectedEmployeeId}.pdf` : null"
+                                    :class="['MainPayBtn', { disabled: !selectedEmployeeId || !payslipVisible }]">
+
+                                    Create Digital Payslip (PDF)
+
+                                </a>
 
                             </div>
 
@@ -206,22 +212,19 @@ z<template>
                         <br>
                         34%
                         <br>
-                        {{ calculatePAYE.toFixed(2).toLocaleString() }}
+                        R {{ calculatePAYE.toFixed(2).toLocaleString() }}
                         <br>
                         2%
                         <br>
-                        {{ calculateUIF.toFixed(2).toLocaleString() }}
+                        R {{ calculateUIF.toFixed(2).toLocaleString() }}
                         <br>
                         5%
                         <br>
-                        {{ calculateHealthInsure.toFixed(2).toLocaleString() }}
+                        R {{ calculateHealthInsure.toFixed(2).toLocaleString() }}
                         <br>
                         <br>
                         <br>
                         R {{ calculateTakeHome.toFixed(2).toLocaleString() }}
-
-
-
 
                     </div>
 
@@ -313,7 +316,7 @@ export default {
             if (this.selectedEmployee && this.selectedEmployeeDetails) {
                 let iPercent = 2;
                 return this.selectedEmployee.finalSalary * (iPercent / 100)
-  
+
             }
 
         },
@@ -413,8 +416,15 @@ export default {
     transition: box-shadow 0.2s ease;
     transition: transform 0.3s ease;
     font-size: 18px;
+    display: block;
 
 }
+
+.MainPayBtn a{
+    text-decoration: none;
+}
+
+
 
 .MainPayBtn:hover {
     background: #e2a54d;
