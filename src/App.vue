@@ -1,8 +1,20 @@
 <template>
   <div class="d-flex">
     <NavBar v-if="showNavbar" />
+    
+    <div class="content flex-grow-1 position-relative p-3">
+      <!-- Show Nav toggle button only if NavBar is shown -->
+      <button
+        v-if="showNavbar"
+        class="btn NavButton"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#offcanvasExample"
+        aria-controls="offcanvasExample"
+      >
+        ☰
+      </button>
 
-    <div class="content flex-grow-1 p-3">
       <router-view />
     </div>
   </div>
@@ -20,6 +32,7 @@ export default {
   setup() {
     const route = useRoute();
 
+    // Only hide navbar on login page
     const showNavbar = computed(() => route.name !== "login");
 
     return {
@@ -37,9 +50,26 @@ export default {
   text-align: center;
   color: #2c3e50;
   min-height: 100vh;
+  max-height: 99vh;
+  min-width: 99vh;
 }
 
 .content {
   width: 100%;
+  position: relative;
+  padding: 1rem; /* Matches .p-3 Bootstrap class */
+}
+
+.NavButton {
+  background-color: #0c2c47;
+  color: #97d3cd;
+  font-size: large;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+.NavButton:hover {
+  border: #0c2c47 solid 2px;
 }
 </style>
