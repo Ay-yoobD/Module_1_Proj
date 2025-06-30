@@ -6,6 +6,7 @@ import TimeoffView from '@/views/TimeoffView.vue'
 import PayrollView from '@/views/PayrollView.vue'
 import ReviewView from '@/views/ReviewView.vue'
 
+
 const routes = [
   {
     path: '/',

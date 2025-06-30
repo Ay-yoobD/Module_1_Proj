@@ -1,30 +1,86 @@
 <template>
   <div class="container mt-4">
     <h2 class="mb-4">Employees</h2>
+
+    <!-- Add Button -->
+    <button class="btn btn-primary mb-3" @click="openAddModal">Add Employee</button>
+
+    <!-- Employees Table -->
     <table class="table table-striped table-bordered">
       <thead class="table-dark">
         <tr>
-          <th scope="col">#</th>
-          <th scope="col">Name</th>
-          <th scope="col">Position</th>
-          <th scope="col">Department</th>
-          <th scope="col">salary</th>
-          <th scope="col">Employment-history</th>
-          <th scope="col">Contact details</th>
+          <th>#</th>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Department</th>
+          <th>Salary</th>
+          <th>Employment History</th>
+          <th>Contact</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="emp in employees" :key="emp.id">
-          <th scope="row">{{ emp.id }}</th>
+        <tr v-for="(emp, index) in employees" :key="emp.id">
+          <th>{{ emp.id }}</th>
           <td>{{ emp.name }}</td>
           <td>{{ emp.position }}</td>
           <td>{{ emp.department }}</td>
           <td>{{ emp.salary }}</td>
           <td>{{ emp.employmentHistory }}</td>
           <td>{{ emp.contact }}</td>
+          <td>
+            <button class="btn btn-sm btn-warning me-2" @click="openEditModal(emp, index)">Edit</button>
+            <button class="btn btn-sm btn-danger" @click="deleteEmployee(index)">Delete</button>
+          </td>
         </tr>
       </tbody>
     </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true" ref="modal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="employeeModalLabel">{{ isEdit ? 'Edit Employee' : 'Add Employee' }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="saveEmployee">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Name</label>
+                  <input v-model="form.name" type="text" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Position</label>
+                  <input v-model="form.position" type="text" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Department</label>
+                  <input v-model="form.department" type="text" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Salary</label>
+                  <input v-model="form.salary" type="number" class="form-control" required>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Employment History</label>
+                  <input v-model="form.employmentHistory" type="text" class="form-control">
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Contact</label>
+                  <input v-model="form.contact" type="email" class="form-control" required>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button type="submit" class="btn btn-success">{{ isEdit ? 'Update' : 'Add' }}</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -51,6 +107,7 @@ export default {
           employmentHistory: "Joined in 2013, promoted to Senior Manager in 2017",
           contact: "lailaabdurahman@moderntech.com"
         },
+
         {
           id: 3,
           name: "Zayaan Salie",
@@ -124,7 +181,58 @@ export default {
           contact: "fatima.patel@moderntech.com"
         }
       ]
+        // ... Other employees
+      ,
+      form: {
+        name: '',
+        position: '',
+        department: '',
+        salary: '',
+        employmentHistory: '',
+        contact: ''
+      },
+      isEdit: false,
+      currentIndex: null
     };
+  },
+  methods: {
+    openAddModal() {
+      this.resetForm();
+      this.isEdit = false;
+      new bootstrap.Modal(this.$refs.modal).show();
+    },
+    openEditModal(emp, index) {
+      this.form = { ...emp };
+      this.currentIndex = index;
+      this.isEdit = true;
+      new bootstrap.Modal(this.$refs.modal).show();
+    },
+    saveEmployee() {
+      if (this.isEdit) {
+        this.employees.splice(this.currentIndex, 1, { ...this.form, id: this.employees[this.currentIndex].id });
+      } else {
+        const newId = this.employees.length ? Math.max(...this.employees.map(e => e.id)) + 1 : 1;
+        this.employees.push({ ...this.form, id: newId });
+      }
+      bootstrap.Modal.getInstance(this.$refs.modal).hide();
+      this.resetForm();
+    },
+    deleteEmployee(index) {
+      if (confirm("Are you sure you want to delete this employee?")) {
+        this.employees.splice(index, 1);
+      }
+    },
+    resetForm() {
+      this.form = {
+        name: '',
+        position: '',
+        department: '',
+        salary: '',
+        employmentHistory: '',
+        contact: ''
+      };
+      this.currentIndex = null;
+    }
   }
 };
 </script>
@@ -135,10 +243,6 @@ export default {
   border-radius: 12px;
   box-shadow: 0 1px 16px rgba(46, 143, 240, 0.1);
   padding: 32px;
-}
-
-table {
-  border-collapse: collapse;
 }
 
 th, td {
