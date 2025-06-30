@@ -14,8 +14,8 @@
 
           <div class="buttons-container">
             <router-link to="/employees" class="btn primary">View Employees</router-link>
-            <router-link to="/settings" class="btn primary">Manage Account</router-link>
-            <router-link to="/requests" class="btn primary">View Payroll</router-link>
+            <router-link to="/employees" class="btn primary">Manage Account</router-link>
+            <router-link to="/payroll" class="btn primary">View Payroll</router-link>
           </div>
 
           <div class="search-section">
